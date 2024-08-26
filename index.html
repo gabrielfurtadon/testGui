@@ -45,7 +45,7 @@
         function enviarTokenParaBackend(token) {
             const adAccountId = document.getElementById('adAccountId').value;
 
-            fetch('localhost:8080/api/saveToken', {  // Substitua pela URL do seu backend
+            fetch('testgapi-production.up.railway.app/api/saveToken', {  // Substitua pela URL do seu backend
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
