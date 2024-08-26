@@ -43,7 +43,7 @@
         }
 
         function enviarTokenParaBackend(token) {
-            fetch('/api/saveToken', {
+            fetch('localhost:8080/api/saveToken', {  // Substitua pela URL do seu backend
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -51,11 +51,22 @@
                 body: JSON.stringify({ token: token })
             })
             .then(response => response.json())
-            .then(data => console.log('Token salvo com sucesso:', data))
+            .then(data => {
+                console.log('Resposta do Backend:', data);
+                if (data.campaignName) {
+                    document.getElementById('campaignName').innerText = "Nome da Campanha: " + data.campaignName;
+                } else if (data.message) {
+                    document.getElementById('campaignName').innerText = data.message;
+                } else if (data.error) {
+                    document.getElementById('campaignName').innerText = "Erro: " + data.error;
+                }
+            })
             .catch((error) => console.error('Erro ao salvar o token:', error));
         }
     </script>
 
     <button onclick="getAccessToken()">Login com Facebook</button>
+    <button onclick="getAccessToken()">Nome da Campanha</button>
+    <p id="campaignName"></p>
 </body>
 </html>
