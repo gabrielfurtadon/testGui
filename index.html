@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Facebook Login Example</title>
+</head>
+<body>
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '1008426500498419',  // Substitua pelo seu App ID
+                cookie     : true,          
+                xfbml      : true,          
+                version    : 'v13.0'        
+            });
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function getAccessToken() {
+            FB.getLoginStatus(function(response) {
+                if (response.status === 'connected') {
+                    var accessToken = response.authResponse.accessToken;
+                    console.log("Access Token:", accessToken);
+
+                    enviarTokenParaBackend(accessToken);
+                } else {
+                    FB.login(function(response) {
+                        if (response.authResponse) {
+                            var accessToken = response.authResponse.accessToken;
+                            console.log("Access Token após login:", accessToken);
+
+                            enviarTokenParaBackend(accessToken);
+                        }
+                    });
+                }
+            });
+        }
+
+        function enviarTokenParaBackend(token) {
+            fetch('/api/saveToken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: token })
+            })
+            .then(response => response.json())
+            .then(data => console.log('Token salvo com sucesso:', data))
+            .catch((error) => console.error('Erro ao salvar o token:', error));
+        }
+    </script>
+
+    <button onclick="getAccessToken()">Login com Facebook</button>
+</body>
+</html>
