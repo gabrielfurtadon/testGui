@@ -43,12 +43,17 @@
         }
 
         function enviarTokenParaBackend(token) {
+            const adAccountId = document.getElementById('adAccountId').value;
+
             fetch('localhost:8080/api/saveToken', {  // Substitua pela URL do seu backend
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ token: token })
+                body: JSON.stringify({ 
+                    token: token,
+                    adAccountId: adAccountId
+                })
             })
             .then(response => response.json())
             .then(data => {
@@ -65,8 +70,11 @@
         }
     </script>
 
+    <div>
+        <label for="adAccountId">ID da Conta de Anúncios:</label>
+        <input type="text" id="adAccountId" placeholder="act_123456789" required>
+    </div>
     <button onclick="getAccessToken()">Login com Facebook</button>
-    <button onclick="getAccessToken()">Nome da Campanha</button>
     <p id="campaignName"></p>
 </body>
 </html>
