@@ -5,33 +5,45 @@
 </head>
 <body>
     <script>
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
+        function getAccessToken() {
+            const configId = '1016393966629039';  // O config_id que você obteve
+            const clientId = '1008426500498419';  // Seu App ID do Facebook
+            const redirectUri = encodeURIComponent('https://gabrielfurtadon.github.io/testGui/');  // Substitua pela sua URL de redirecionamento
+
+            // Construindo a URL de login com o config_id
+            const oauthUrl = `https://www.facebook.com/v17.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=some_string&config_id=${configId}`;
+
+            // Redirecionar o usuário para a URL de login
+            window.location.href = oauthUrl;
         }
 
-        function exchangeCodeForAccessToken(code) {
-            const clientId = '1008426500498419';  // Seu App ID
-            const redirectUri = encodeURIComponent('https://gabrielfurtadon.github.io/testGui/');
-            const clientSecret = '50fb5687c9b0e3c33a86e26beb13cee5';  // Substitua pelo seu Client Secret
+        function mostrarAccessToken() {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
 
-            const tokenUrl = `https://graph.facebook.com/v13.0/oauth/access_token?client_id=${clientId}&redirect_uri=${redirectUri}&client_secret=${clientSecret}&code=${code}`;
+            if (code) {
+                // Substitua pelo seu Client Secret e execute essa lógica no backend para maior segurança em produção
+                const clientSecret = '50fb5687c9b0e3c33a86e26beb13cee5';  // Substitua pelo seu Client Secret
+                const clientId = '1008426500498419';  // Seu App ID do Facebook
+                const redirectUri = 'https://gabrielfurtadon.github.io/testGui/';  // URL de redirecionamento
 
-            fetch(tokenUrl, {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.access_token) {
-                    document.getElementById('accessTokenDisplay').innerText = "Access Token: " + data.access_token;
-                    enviarTokenParaBackend(data.access_token);
-                } else {
-                    document.getElementById('accessTokenDisplay').innerText = "Erro ao obter o Access Token.";
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao trocar o código pelo access token:', error);
-            });
+                const tokenUrl = `https://graph.facebook.com/v13.0/oauth/access_token?client_id=${clientId}&redirect_uri=${redirectUri}&client_secret=${clientSecret}&code=${code}`;
+
+                fetch(tokenUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.access_token) {
+                        document.getElementById('accessTokenDisplay').innerText = "Access Token: " + data.access_token;
+                    } else {
+                        document.getElementById('accessTokenDisplay').innerText = "Erro ao obter o Access Token.";
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao trocar o código pelo access token:', error);
+                });
+            } else {
+                document.getElementById('accessTokenDisplay').innerText = "Código de autorização não encontrado.";
+            }
         }
 
         function enviarTokenParaBackend(token) {
@@ -59,18 +71,14 @@
             })
             .catch((error) => console.error('Erro ao salvar o token:', error));
         }
-
-        // Quando a página é carregada, verificar se há um código na URL e trocá-lo por um access token
-        const code = getQueryParam('code');
-        if (code) {
-            exchangeCodeForAccessToken(code);
-        }
     </script>
 
     <div>
         <label for="adAccountId">ID da Conta de Anúncios:</label>
         <input type="text" id="adAccountId" placeholder="act_123456789" required>
     </div>
+    <button onclick="getAccessToken()">Login com Facebook</button>
+    <button onclick="mostrarAccessToken()">Mostrar Access Token</button>
     <p id="accessTokenDisplay"></p>
     <p id="campaignName"></p>
 </body>
