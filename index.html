@@ -1,85 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Facebook Login Example</title>
+<title>Facebook Login JavaScript Example</title>
+<meta charset="UTF-8">
 </head>
 <body>
-    <script>
-        function getAccessToken() {
-            const configId = '1016393966629039';  // O config_id que você obteve
-            const clientId = '1008426500498419';  // Seu App ID do Facebook
-            const redirectUri = encodeURIComponent('https://gabrielfurtadon.github.io/testGui/');  // Substitua pela sua URL de redirecionamento
+<script>
 
-            // Construindo a URL de login com o config_id
-            const oauthUrl = `https://www.facebook.com/v17.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=some_string&config_id=${configId}`;
+  function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
+    console.log('statusChangeCallback');
+    console.log(response);                   // The current login status of the person.
+    if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+      testAPI();  
+    } else {                                 // Not logged into your webpage or we are unable to tell.
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into this webpage.';
+    }
+  }
 
-            // Redirecionar o usuário para a URL de login
-            window.location.href = oauthUrl;
-        }
 
-        function mostrarAccessToken() {
-            const params = new URLSearchParams(window.location.search);
-            const code = params.get('code');
+  function checkLoginState() {               // Called when a person is finished with the Login Button.
+    FB.getLoginStatus(function(response) {   // See the onlogin handler
+      statusChangeCallback(response);
+    });
+  }
 
-            if (code) {
-                // Substitua pelo seu Client Secret e execute essa lógica no backend para maior segurança em produção
-                const clientSecret = '50fb5687c9b0e3c33a86e26beb13cee5';  // Substitua pelo seu Client Secret
-                const clientId = '1008426500498419';  // Seu App ID do Facebook
-                const redirectUri = 'https://gabrielfurtadon.github.io/testGui/';  // URL de redirecionamento
 
-                const tokenUrl = `https://graph.facebook.com/v13.0/oauth/access_token?client_id=${clientId}&redirect_uri=${redirectUri}&client_secret=${clientSecret}&code=${code}`;
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1008426500498419',
+      cookie     : true,                     // Enable cookies to allow the server to access the session.
+      xfbml      : true,                     // Parse social plugins on this webpage.
+      version    : 'v20.0'           // Use this Graph API version for this call.
+    });
 
-                fetch(tokenUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.access_token) {
-                        document.getElementById('accessTokenDisplay').innerText = "Access Token: " + data.access_token;
-                    } else {
-                        document.getElementById('accessTokenDisplay').innerText = "Erro ao obter o Access Token.";
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao trocar o código pelo access token:', error);
-                });
-            } else {
-                document.getElementById('accessTokenDisplay').innerText = "Código de autorização não encontrado.";
-            }
-        }
 
-        function enviarTokenParaBackend(token) {
-            const adAccountId = document.getElementById('adAccountId').value;
+    FB.getLoginStatus(function(response) {   // Called after the JS SDK has been initialized.
+      statusChangeCallback(response);        // Returns the login status.
+    });
+  };
+ 
+  function testAPI() {                      // Testing Graph API after login.  See statusChangeCallback() for when this call is made.
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+    });
+  }
 
-            fetch('https://testgapi-production.up.railway.app/api/saveToken', {  // Substitua pela URL do seu backend
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    token: token,
-                    adAccountId: adAccountId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.campaignName) {
-                    document.getElementById('campaignName').innerText = "Nome da Campanha: " + data.campaignName;
-                } else if (data.message) {
-                    document.getElementById('campaignName').innerText = data.message;
-                } else if (data.error) {
-                    document.getElementById('campaignName').innerText = "Erro: " + data.error;
-                }
-            })
-            .catch((error) => console.error('Erro ao salvar o token:', error));
-        }
-    </script>
+</script>
 
-    <div>
-        <label for="adAccountId">ID da Conta de Anúncios:</label>
-        <input type="text" id="adAccountId" placeholder="act_123456789" required>
-    </div>
-    <button onclick="getAccessToken()">Login com Facebook</button>
-    <button onclick="mostrarAccessToken()">Mostrar Access Token</button>
-    <p id="accessTokenDisplay"></p>
-    <p id="campaignName"></p>
+
+<!-- The JS SDK Login Button -->
+
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button>
+
+<div id="status">
+</div>
+
+<!-- Load the JS SDK asynchronously -->
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 </body>
 </html>
