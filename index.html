@@ -1,66 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Facebook Login JavaScript Example</title>
-<meta charset="UTF-8">  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Login Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input[type="text"] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: #4267B2;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #365899;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
 
-<div id="status"></div>
+<div class="container">
+  <h1>Facebook Login Example</h1>
+  
+  <fb:login-button 
+    scope="public_profile,email"
+    onlogin="checkLoginState();">
+  </fb:login-button>
+
+  <div>
+    <input type="text" id="adAccountId" placeholder="ID da Conta de Anúncios" required>
+  </div>
+  <button onclick="showInsights()">Mostrar Insights</button>
+  
+  <div id="status"></div>
+</div>
 
 <script>
-    window.fbAsyncInit = function() {
-      FB.init({
-        appId      : '1008426500498419',
-        cookie     : true,
-        xfbml      : true,
-        version    : 'v13.0'
-      });
-        
-      FB.AppEvents.logPageView();   
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1008426500498419',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v13.0'
+    });
+      
+    FB.AppEvents.logPageView();   
 
-      // Verifica o status de login no início
-      FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-      });
-    };
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  };
 
-    (function(d, s, id){
-       var js, fjs = d.getElementsByTagName(s)[0];
-       if (d.getElementById(id)) {return;}
-       js = d.createElement(s); js.id = id;
-       js.src = "https://connect.facebook.net/en_US/sdk.js";
-       fjs.parentNode.insertBefore(js, fjs);
-     }(document, 'script', 'facebook-jssdk'));
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
 
-    // Esta função é chamada após o login ser concluído
-    function statusChangeCallback(response) {
-      if (response.status === 'connected') {
-        // O usuário está logado e autorizou o aplicativo
-        getUserInfo();
-      } else {
-        document.getElementById('status').innerText = 'Por favor, faça login no Facebook.';
-      }
+  function statusChangeCallback(response) {
+    if (response.status === 'connected') {
+      getUserInfo();
+    } else {
+      document.getElementById('status').innerText = 'Por favor, faça login no Facebook.';
     }
+  }
 
-    function getUserInfo() {
-      FB.api('/me', function(response) {
-        document.getElementById('status').innerText =
-          'Bem-vindo, ' + response.name + '!';
-      });
-    }
+  function getUserInfo() {
+    FB.api('/me', function(response) {
+      document.getElementById('status').innerText =
+        'Bem-vindo, ' + response.name + '!';
+    });
+  }
 
-    function checkLoginState() {
-      FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-      });
-    }
-  </script>
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
 
-<fb:login-button 
-  scope="public_profile,email"
-  onlogin="checkLoginState();">
-</fb:login-button>
+  function showInsights() {
+    // Ação futura para mostrar insights
+    alert('Mostrar insights em breve!');
+  }
+</script>
 
 </body>
 </html>
