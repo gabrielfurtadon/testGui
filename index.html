@@ -6,7 +6,8 @@
 </head>
 <body>
 
-    
+<div id="status"></div>
+
 <script>
     window.fbAsyncInit = function() {
       FB.init({
@@ -17,9 +18,13 @@
       });
         
       FB.AppEvents.logPageView();   
-        
+
+      // Verifica o status de login no início
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
     };
-  
+
     (function(d, s, id){
        var js, fjs = d.getElementsByTagName(s)[0];
        if (d.getElementById(id)) {return;}
@@ -28,15 +33,33 @@
        fjs.parentNode.insertBefore(js, fjs);
      }(document, 'script', 'facebook-jssdk'));
 
-     
-    FB.getLoginStatus(function(response) {
+    // Esta função é chamada após o login ser concluído
+    function statusChangeCallback(response) {
+      if (response.status === 'connected') {
+        // O usuário está logado e autorizou o aplicativo
+        getUserInfo();
+      } else {
+        document.getElementById('status').innerText = 'Por favor, faça login no Facebook.';
+      }
+    }
+
+    function getUserInfo() {
+      FB.api('/me', function(response) {
+        document.getElementById('status').innerText =
+          'Bem-vindo, ' + response.name + '!';
+      });
+    }
+
+    function checkLoginState() {
+      FB.getLoginStatus(function(response) {
         statusChangeCallback(response);
-    });
+      });
+    }
   </script>
 
-  
 <fb:login-button 
-onlogin="checkLoginState();">
+  scope="public_profile,email"
+  onlogin="checkLoginState();">
 </fb:login-button>
 
 </body>
